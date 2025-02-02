@@ -73,6 +73,7 @@ def process_file(file_path: str):
 
     ext = os.path.splitext(file_path)[1].lower()
     if ext in ['.zip', '.rar', '.7z']:
+        folder_name = new_filename.split(".")[0]
         extract_dir = os.path.join(dirname, os.path.splitext(new_filename)[0])
         os.makedirs(extract_dir, exist_ok=True)
         extract_file(file_path, extract_dir)
@@ -81,6 +82,10 @@ def process_file(file_path: str):
         category_dir = os.path.join(BASE_DIR, category)
         os.makedirs(category_dir, exist_ok=True)
         os.remove(file_path)
+        
+        parent_id = db.find_file(category)["_id"]
+        db.insert_file(folder_name, category, parent_id=parent_id)
+        _id = db.find_file(folder_name)["_id"]
 
         item_dir = extract_dir.split("/")[-1]
         for root, dirs, files in os.walk(extract_dir):
@@ -92,15 +97,18 @@ def process_file(file_path: str):
                 dst = os.path.join(category_dir, item_dir, f)
                 os.makedirs(os.path.dirname(dst), exist_ok=True)
                 shutil.move(src, dst)
+                db.insert_file(f, category, folder=False, parent_id=_id)
 
         shutil.rmtree(extract_dir)
-
+        
         print(f"{item_dir} moved do {category}")
     elif ext == ".stl":
         category = classify_file(new_filename)
         category_dir = os.path.join(BASE_DIR, category)
         os.makedirs(category_dir, exist_ok=True)
         shutil.move(new_path, os.path.join(BASE_DIR, category, new_filename))
+        parent_id = db.find_file(category)["_id"]
+        db.insert_file(new_filename, category, folder=False, parent_id=parent_id)
         print(f"File {new_filename} moved to {category}")
     else:
         print(f"File {new_filename} has unsupported type.")

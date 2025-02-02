@@ -39,6 +39,10 @@ class DatabaseManager:
         if not self.files.find_one({"name": "root_folder"}):
             print("Initializing database...")
             self.files.insert_one({"name": "root_folder", "category": "Root", "folder": True, "children": []})
+            self.files.insert_one({"name": "terrain", "category": "root_folder", "folder": True, "children": []})
+            self.files.insert_one({"name": "basing", "category": "root_folder", "folder": True, "children": []})
+            self.files.insert_one({"name": "creature", "category": "root_folder", "folder": True, "children": []})
+            self.files.insert_one({"name": "character", "category": "root_folder", "folder": True, "children": []})
         else:
             print("Database already exists.")
 
@@ -80,6 +84,6 @@ class DatabaseManager:
 
 if __name__ == "__main__":
     db = DatabaseManager()
-    # db.reset_database()
-    db.initialize_db()
+    db.reset_database()
+    # db.initialize_db()
     print("✅ Database created or exists.")
