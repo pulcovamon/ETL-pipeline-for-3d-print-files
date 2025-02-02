@@ -1,0 +1,7 @@
+uvicorn==0.34.0
+pymongo==4.11
+fastapi==0.115.8
+torch==2.6.0
+pyunpack==0.3
+transformers==4.48.2
+py7zr==0.22.0
