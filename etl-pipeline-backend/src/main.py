@@ -2,26 +2,35 @@ import os
 import re
 from typing import List
 
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, UploadFile, File, BackgroundTasks, HTTPException
 from fastapi.responses import FileResponse, JSONResponse
+import uvicorn
 
-from pipeline import (
+from .pipeline import (
     process_unsorted_directory,
     UNSORTED_DIR,
     sanitize_filename,
     BASE_DIR,
     CATEGORIES,
 )
-from database import DatabaseManager
+from .database import DatabaseManager
 
 db = DatabaseManager()
 
 app = FastAPI(title="ETL Pipeline API")
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 #########################
 # API Endpoints         #
 #########################
-
 
 @app.post("/upload")
 async def upload_files(
@@ -46,7 +55,10 @@ async def upload_files(
 @app.get("/files/{parent}")
 def list_files(parent: str):
     try:
-        files = dict(db.find_file(parent))
+        if parent in CATEGORIES:
+            files = dict(db.get_category(parent))
+        else:
+            files = dict(db.find_file(parent))
         files["_id"] = str(files["_id"])
         return JSONResponse(content=files)
     except:
@@ -81,3 +93,7 @@ def download_file(parent: str, filename: str):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+    
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8080)

@@ -5,3 +5,6 @@ torch==2.6.0
 pyunpack==0.3
 transformers==4.48.2
 py7zr==0.22.0
+fastapi-cli==0.0.7
+python-multipart
+patool==3.1.0

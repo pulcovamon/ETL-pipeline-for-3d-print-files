@@ -8,7 +8,7 @@ import py7zr
 from pyunpack import Archive
 from transformers import pipeline
 
-from database import DatabaseManager
+from .database import DatabaseManager
 
 db = DatabaseManager()
 config = db.get_config()
@@ -18,7 +18,7 @@ classifier = pipeline("zero-shot-classification", model="facebook/bart-large-mnl
 inv_categories = {v: k for k, v in config["categories"].items()}
 config["ignore_words"].extend(config["artists"])
 
-BASE_DIR = "datalake"
+BASE_DIR = os.getenv("DATALAKE_PATH", "datalake")
 UNSORTED_DIR = os.path.join(BASE_DIR, "unsorted")
 CATEGORIES = list(config["categories"].keys())
 CATEGORIES.append("unknown")
@@ -71,7 +71,7 @@ def process_file(file_path: str):
         os.rename(file_path, new_path)
         file_path = new_path
 
-    ext = os.path.splitext(file_path)[1].lower()
+    ext = os.path.splitext(file_path)[-1].lower()
     if ext in ['.zip', '.rar', '.7z']:
         folder_name = new_filename.split(".")[0]
         extract_dir = os.path.join(dirname, os.path.splitext(new_filename)[0])
@@ -83,22 +83,25 @@ def process_file(file_path: str):
         os.makedirs(category_dir, exist_ok=True)
         os.remove(file_path)
         
-        parent_id = db.find_file(category)["_id"]
-        db.insert_file(folder_name, category, parent_id=parent_id)
-        _id = db.find_file(folder_name)["_id"]
-
+        parent = db.get_category(category)
+        parent_id = parent["_id"]
         item_dir = extract_dir.split("/")[-1]
+        children = []
         for root, dirs, files in os.walk(extract_dir):
             for f in files:
                 src = os.path.join(root, f)
-                if f.split(".")[1] not in ["png", "jpg", "jpeg", "stl"]:
+                if f.split(".")[1] not in ["png", "jpg", "jpeg", "stl", "lys", "pdf", "blend"]:
                     os.remove(src)
                     continue
                 dst = os.path.join(category_dir, item_dir, f)
                 os.makedirs(os.path.dirname(dst), exist_ok=True)
                 shutil.move(src, dst)
-                db.insert_file(f, category, folder=False, parent_id=_id)
-
+                children.append({
+                    "name": f,
+                    "category": category,
+                    "folder": False,
+                })
+        db.insert_file(folder_name, category, parent_id=parent_id, children=children)
         shutil.rmtree(extract_dir)
         
         print(f"{item_dir} moved do {category}")
