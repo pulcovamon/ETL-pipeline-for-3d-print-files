@@ -5,25 +5,29 @@
 ### Run MongoDB in docker
 ```
 docker run --name mongo-container -d -p 27017:27017 mongo
+docker exec -i mongo-container mongosh < ./init-mongo.js
 ```
 
 ### Create venv and install packages
 ```
+cd etl-pipeline-backend
 python -m venv .venv
+source .venv/bin/activate
 pip install -r requirements
-```
-
-### Create root directory for 3d print files
-```
-mkdir datalake
-```
-
-### Create database
-```
-python database.py
 ```
 
 ### Run uvicorn app
 ```
-uvicorn main:app --host 0.0.0.0 --port 8000
+uvicorn src.main:app --host 0.0.0.0 --port 8000
+```
+
+### Install js packages
+```
+cd etl-pipeline-client
+npm install
+```
+
+### Run React app
+```
+npm run dev
 ```
