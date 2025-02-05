@@ -52,38 +52,23 @@ async def upload_files(
     return {"status": "Files uploaded", "files": saved_files}
 
 
-@app.get("/files/{parent}")
-def list_files(parent: str):
+@app.get("/files/{category}")
+def list_files(category: str):
     try:
-        if parent in CATEGORIES:
-            files = dict(db.get_category(parent))
-        else:
-            files = dict(db.find_file(parent))
+        files = dict(db.get_category(category))
         files["_id"] = str(files["_id"])
         return JSONResponse(content=files)
-    except:
-        raise HTTPException(status_code=404, detail="Invalid parent")
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=404, detail=f"Category does not exist!")
 
 
-@app.get("/files/{parent}/{filename}")
-def download_file(parent: str, filename: str):
+@app.get("/files/{category}/{filename}")
+def download_file(category: str, filename: str, parent: str=None):
     try:
-        parent_entry = dict(db.find_file(parent))
-        if not parent_entry.get("folder", False):
-            raise HTTPException(status_code=400, detail="Parent is not a folder")
-
-        file_entry = next(
-            (f for f in parent_entry.get("children", []) if f["name"] == filename), None
-        )
-        if not file_entry:
-            raise HTTPException(status_code=404, detail="File not found in this folder")
-
-        parent_path = (
-            parent_entry["name"]
-            if file_entry["category"] == parent_entry["name"]
-            else os.path.join(category, parent_entry["name"])
-        )
-        file_path = os.path.join(BASE_DIR, parent_path, filename)
+        if parent:
+            filename = os.path.join(parent, filename)
+        file_path = os.path.join(BASE_DIR, category, filename)
 
         print(file_path)
         if not os.path.isfile(file_path):
