@@ -1,0 +1,39 @@
+services:
+  api:
+    image: etl-pipeline-api:latest
+    depends_on:
+      mongo:
+        condition: service_healthy
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/file_database
+      - DATALAKE_PATH=/app/datalake
+    volumes:
+      - datalake_volume:/app/datalake
+    ports:
+      - "80:80"
+    networks:
+      - etl-pipeline
+
+  mongo:
+    image: mongo:latest
+    volumes:
+      - mongo_data:/data/db
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=file_database
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+    networks:
+      - etl-pipeline
+
+volumes:
+  datalake_volume:
+  mongo_data:
+
+networks:
+  etl-pipeline:
