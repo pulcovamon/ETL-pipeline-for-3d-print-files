@@ -1,7 +1,6 @@
 import { Folder } from "./types";
 import FileItem from "./FileItem";
 import { useState } from "react";
-import axios from "axios";
 
 interface FolderItemProps {
   parentCategory: string;
@@ -37,16 +36,6 @@ export default function FolderItem({
             : cat
         )
       );
-    }
-  }
-
-  async function getCategory(category: string): Promise<Folder[]> {
-    try {
-      const response = await axios.get(`http://0.0.0.0:8080/files/${category}`);
-      return response.data.children || [];
-    } catch (error) {
-      console.error(error);
-      return [];
     }
   }
 
