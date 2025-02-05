@@ -62,7 +62,7 @@ export default function FolderItem({
         (folder.children ? (
           <ul className="pl-5 mt-2 bg-gray-100 rounded-md">
             {folder.children.map((subFolder) => (
-              <FileItem key={subFolder.name} file={subFolder} />
+              <FileItem key={subFolder.name} file={subFolder} parent={folder.name} category={parentCategory} />
             ))}
           </ul>
         ) : (
