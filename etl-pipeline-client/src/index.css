@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+.file-structure-container {
+    padding: 20px;
+}
+
+.category {
+    padding: 10px;
+}
+
+.category-files {
+    padding-left: 10px;
+}
