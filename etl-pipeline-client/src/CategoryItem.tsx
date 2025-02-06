@@ -26,7 +26,7 @@ export default function CategoryItem({
     <li className="category mb-2">
       <button
         onClick={() => handleCategoryClick(category.name)}
-        className="text-left w-full p-3 text-lg font-semibold rounded-md bg-gray-200 hover:bg-gray-300 focus:outline-none"
+        className="text-left w-full p-3 text-lg font-semibold rounded-md bg-gray-200 hover:bg-gray-300 focus:outline-none cursor-pointer"
       >
         {category.name}
       </button>
@@ -35,7 +35,7 @@ export default function CategoryItem({
           {category.children.length > 0 ? (
             category.children.map((child) => (
                 isFile(child) ?
-                <FileItem file={child} /> :
+                <FileItem file={child} parent={null} category={category.name} /> :
               <FolderItem
                 key={child.name}
                 parentCategory={category.name}

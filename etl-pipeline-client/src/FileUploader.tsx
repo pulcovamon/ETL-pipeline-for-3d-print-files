@@ -54,7 +54,7 @@ export default function FileUploader() {
         <button
           onClick={handleButtonClick}
           type="button"
-          className="file-button"
+          className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 cursor-pointer"
         >
           Select File
         </button>
@@ -73,7 +73,7 @@ export default function FileUploader() {
 
       <button
         onClick={handleFileUpload}
-        className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+        className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 cursor-pointer"
         disabled={isUploading || !files}
       >
         {isUploading ? "Uploading..." : "Send"}

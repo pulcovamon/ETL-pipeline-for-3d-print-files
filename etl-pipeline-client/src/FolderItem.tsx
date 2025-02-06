@@ -43,7 +43,7 @@ export default function FolderItem({
     <li>
       <button
         onClick={handleFolderClick}
-        className="text-gray-700 hover:bg-gray-200 p-2 rounded-md"
+        className="text-gray-700 hover:bg-gray-200 p-2 rounded-md cursor-pointer"
       >
         {folder.name}
       </button>
