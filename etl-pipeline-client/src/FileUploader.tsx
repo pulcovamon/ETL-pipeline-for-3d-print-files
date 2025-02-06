@@ -12,6 +12,26 @@ export default function FileUploader() {
     }
   };
 
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setIsDragging(false);
+    if (event.dataTransfer.files.length > 0) {
+      const file = event.dataTransfer.files[0];
+      setFiles((prevFiles) => [...prevFiles, file]);
+    }
+  };
+
   const handleFileUpload = async () => {
     if (files.length === 0) return;
 
@@ -43,8 +63,12 @@ export default function FileUploader() {
   };
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="border-2 border-dashed p-6 rounded-lg text-center">
+    <div className="p-6 space-y-6 flex flex-col justify-items-center">
+      <div
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          className={`border-2 border-dashed p-6 rounded-lg text-center ${isDragging ? "border-green-500" : ""}`}>
         <p className="text-sm text-gray-700 dark:text-white">Drag & drop or click to select files (ZIP, RAR, 7Z, STL)</p>
         <input
           type="file"
@@ -52,8 +76,8 @@ export default function FileUploader() {
           accept=".zip,.rar,.7z,.stl"
           className="hidden"
           onChange={handleFileChange}
-          id="fileInput"
-        />
+          id="fileInput">
+          </input>
         <button
           onClick={handleButtonClick}
           type="button"
@@ -84,7 +108,7 @@ export default function FileUploader() {
 
       <button
         onClick={handleFileUpload}
-        className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 cursor-pointer"
+        className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 cursor-pointer disabled:bg-gray-500 disabled:hover:bg-gray-500 disabled:cursor-not-allowed"
         disabled={isUploading || files.length === 0}
       >
         {isUploading ? "Uploading..." : "Send"}
