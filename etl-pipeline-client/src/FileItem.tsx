@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Download } from "lucide-react"; // Importujeme ikonu pro download
 import STLViewer from "./StlViewer";
 import { Folder } from "./types";
 
@@ -36,17 +37,28 @@ export default function FileItem({ file, parent = null, category }: FileItemProp
       )}
 
       {showViewer && isSTL && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex items-center justify-center">
-          <div className="bg-white bg-opacity-80 p-6 rounded-lg shadow-lg relative">
-            <STLViewer fileUrl={fileURL} />
-            <div className="absolute top-2 right-2">
-              <a href={fileURL }>Download</a>
-            <button
-              onClick={() => setShowViewer(false)}
-              className="mt-4 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
-            >
-              ✕
-            </button>
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center z-50">
+          <div className="bg-white bg-opacity-95 rounded-lg shadow-lg p-6 relative flex flex-col items-center">
+            <div className="flex items-center justify-center border border-gray-300 rounded-lg overflow-hidden">
+              <STLViewer fileUrl={fileURL} />
+            </div>
+
+            <div className="absolute top-4 right-4 flex gap-3">
+              <a
+                href={fileURL}
+                download
+                className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
+              >
+                <Download size={20} />
+                Download
+              </a>
+
+              <button
+                onClick={() => setShowViewer(false)}
+                className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition cursor-pointer"
+              >
+                ✕
+              </button>
             </div>
           </div>
         </div>
