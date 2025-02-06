@@ -45,7 +45,7 @@ export default function FileUploader() {
   return (
     <div className="p-6 space-y-6">
       <div className="border-2 border-dashed p-6 rounded-lg text-center">
-        <p className="text-sm text-gray-700">Drag & drop or click to select files (ZIP, RAR, 7Z, STL)</p>
+        <p className="text-sm text-gray-700 dark:text-white">Drag & drop or click to select files (ZIP, RAR, 7Z, STL)</p>
         <input
           type="file"
           multiple
@@ -72,7 +72,7 @@ export default function FileUploader() {
                 {file.name}
                 <button
                   onClick={() => handleRemoveFile(file.name)}
-                  className="ml-2 text-red-500 hover:text-red-700"
+                  className="ml-2 text-red-500 hover:text-red-700 cursor-pointer"
                 >
                   ✕
                 </button>

@@ -26,12 +26,12 @@ export default function CategoryItem({
     <li className="category mb-2">
       <button
         onClick={() => handleCategoryClick(category.name)}
-        className="text-left w-full p-3 text-lg font-semibold rounded-md bg-gray-200 hover:bg-gray-300 focus:outline-none cursor-pointer"
+        className="text-left w-full p-3 text-lg font-semibold rounded-md bg-gray-200 hover:bg-gray-300 focus:outline-none cursor-pointer dark:bg-gray-800 dark:hover:bg-gray-700"
       >
         {category.name}
       </button>
       {openCategories.includes(category.name) && (
-        <ul className="category-files pl-5 mt-2 bg-gray-100 rounded-md">
+        <ul className="category-files pl-5 mt-2 bg-gray-100 rounded-md dark:bg-gray-800">
           {category.children.length > 0 ? (
             category.children.map((child) => (
                 isFile(child) ?
@@ -45,7 +45,7 @@ export default function CategoryItem({
               />
             ))
           ) : (
-            <p className="text-gray-500 text-sm p-2">Empty</p>
+            <p className="text-gray-500 text-sm p-2 dark:text-white">Empty</p>
           )}
         </ul>
       )}

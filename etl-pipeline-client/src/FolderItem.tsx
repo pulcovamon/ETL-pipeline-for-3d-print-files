@@ -43,13 +43,13 @@ export default function FolderItem({
     <li>
       <button
         onClick={handleFolderClick}
-        className="text-gray-700 hover:bg-gray-200 p-2 rounded-md cursor-pointer"
+        className="text-gray-700 hover:bg-gray-200 p-2 rounded-md cursor-pointer dark:text-white dark:hover:bg-gray-700"
       >
         {folder.name}
       </button>
       {openFolder &&
         (folder.children ? (
-          <ul className="pl-5 mt-2 bg-gray-100 rounded-md">
+          <ul className="pl-5 mt-2 bg-gray-100 rounded-md dark:bg-gray-800">
             {folder.children.map((subFolder) => (
               <FileItem key={subFolder.name} file={subFolder} parent={folder.name} category={parentCategory} />
             ))}

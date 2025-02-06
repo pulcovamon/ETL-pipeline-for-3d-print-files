@@ -43,7 +43,7 @@ export default function FileStructure({
   }
 
   return (
-    <div className="file-structure-container p-6 bg-gray-50 rounded-lg shadow-lg">
+    <div className="file-structure-container p-6 bg-gray-50 rounded-lg shadow-lg dark:bg-gray-900 w-full">
       <ul>
         {categories.map((category) => (
           <CategoryItem
@@ -51,7 +51,7 @@ export default function FileStructure({
                 category={category}
                 openCategories={openCategories}
                 handleCategoryClick={handleCategoryClick}
-                setCategories={setCategories} categories={categories}          />
+                setCategories={setCategories} categories={categories}/>
         ))}
       </ul>
     </div>
