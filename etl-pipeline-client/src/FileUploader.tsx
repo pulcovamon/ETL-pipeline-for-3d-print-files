@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { X } from "lucide-react";
 
 export default function FileUploader() {
   const [files, setFiles] = useState<File[]>([]);
@@ -98,7 +99,7 @@ export default function FileUploader() {
                   onClick={() => handleRemoveFile(file.name)}
                   className="ml-2 text-red-500 hover:text-red-700 cursor-pointer"
                 >
-                  ✕
+                  <X size={20}/>
                 </button>
               </li>
             ))}
