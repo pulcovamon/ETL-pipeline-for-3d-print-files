@@ -2,22 +2,23 @@ import { useState } from "react";
 import axios from "axios";
 
 export default function FileUploader() {
-  const [files, setFiles] = useState<FileList | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
   const [isUploading, setIsUploading] = useState(false);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
-      setFiles(event.target.files);
+      const newFiles = Array.from(event.target.files);
+      setFiles((prevFiles) => [...prevFiles, ...newFiles]);
     }
   };
 
   const handleFileUpload = async () => {
-    if (!files || files.length === 0) return;
+    if (files.length === 0) return;
 
     const formData = new FormData();
-    for (const file of files) {
+    files.forEach((file) => {
       formData.append("files", file);
-    }
+    });
 
     setIsUploading(true);
     try {
@@ -30,7 +31,6 @@ export default function FileUploader() {
       alert("Failed to upload files.");
     } finally {
       setIsUploading(false);
-      setFiles(null);
     }
   };
 
@@ -38,6 +38,9 @@ export default function FileUploader() {
     document.getElementById("fileInput")?.click();
   };
 
+  const handleRemoveFile = (fileName: string) => {
+    setFiles((prevFiles) => prevFiles.filter((file) => file.name !== fileName));
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -60,12 +63,20 @@ export default function FileUploader() {
         </button>
       </div>
 
-      {files && files.length > 0 && (
+      {files.length > 0 && (
         <div>
           <h3 className="font-semibold">Selected Files</h3>
           <ul className="list-disc pl-5 mt-2">
-            {Array.from(files).map((file) => (
-              <li key={file.name}>{file.name}</li>
+            {files.map((file) => (
+              <li key={file.name} className="flex justify-between items-center">
+                {file.name}
+                <button
+                  onClick={() => handleRemoveFile(file.name)}
+                  className="ml-2 text-red-500 hover:text-red-700"
+                >
+                  ✕
+                </button>
+              </li>
             ))}
           </ul>
         </div>
@@ -74,7 +85,7 @@ export default function FileUploader() {
       <button
         onClick={handleFileUpload}
         className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 cursor-pointer"
-        disabled={isUploading || !files}
+        disabled={isUploading || files.length === 0}
       >
         {isUploading ? "Uploading..." : "Send"}
       </button>
