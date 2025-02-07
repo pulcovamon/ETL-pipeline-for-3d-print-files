@@ -5,7 +5,7 @@ from typing import List
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, UploadFile, File, BackgroundTasks, HTTPException
 from fastapi.responses import FileResponse, JSONResponse
-import uvicorn
+from pydantic import BaseModel
 
 from .pipeline import (
     process_unsorted_directory,
@@ -27,6 +27,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+class NewCategory(BaseModel):
+    name: str
 
 #########################
 # API Endpoints         #
@@ -59,8 +62,25 @@ def list_files(category: str):
         files["_id"] = str(files["_id"])
         return JSONResponse(content=files)
     except Exception as e:
-        print(e)
         raise HTTPException(status_code=404, detail=f"Category does not exist!")
+    
+    
+@app.get("/categories")
+def get_categories():
+    categories = dict(db.get_category("datalake"))["children"]
+    return JSONResponse(categories)
+    
+    
+@app.post("/categories")
+def create_category(category: NewCategory):
+    root = dict(db.get_category("datalake"))
+    if category.name in root["children"]:
+        raise HTTPException(status_code=403, detail="Category already exists!")
+    root["children"].append(category.name)
+    db.update_file(root["_id"], root)
+    data = db.insert_file(category.name, category="")
+    data["_id"] = str(data["_id"])
+    return JSONResponse(data)
 
 
 @app.get("/files/{category}/{filename}")
