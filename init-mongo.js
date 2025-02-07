@@ -32,14 +32,18 @@ if (!db.config.findOne({ type: "settings" })) {
 // File structure
 if (!db.files.findOne({ name: "root_folder" })) {
     print("Initializing database...");
-    db.files.insertMany([
-        { name: "root_folder", category: "Root", folder: true, children: [] },
-        { name: "terrain", category: "root_folder", folder: true, children: [] },
-        { name: "basing", category: "root_folder", folder: true, children: [] },
-        { name: "creature", category: "root_folder", folder: true, children: [] },
-        { name: "character", category: "root_folder", folder: true, children: [] },
-        { name: "unknown", category: "root_folder", folder: true, children: [] },
-    ]);
+    const categories = [
+        "terrain",
+        "basing",
+        "creature",
+        "character",
+        "unknown"
+    ]
+    const data = categories.map((category) => {
+        return { name: category, category: "", folder: true, children: [] }
+    })
+    data.push({ name: "datalake", category: "", folder: true, children: categories})
+    db.files.insertMany(data);
 } else {
     print("Database already exists.");
 }
