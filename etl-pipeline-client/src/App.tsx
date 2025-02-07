@@ -1,18 +1,14 @@
 import { useState } from "react";
 import FileStructure from "./FileStructure";
 import FileUploader from "./FileUploader";
-
-interface Folder {
-  name: string;
-  children: Folder[];
-}
+import { Folder } from "./types";
 
 export default function App() {
   const [categories, setCategories] = useState<Folder[]>([
-    { name: "terrain", children: [] },
-    { name: "basing", children: [] },
-    { name: "creature", children: [] },
-    { name: "character", children: [] },
+    { name: "terrain", children: [], folder: true },
+    { name: "basing", children: [], folder: true },
+    { name: "creature", children: [], folder: true },
+    { name: "character", children: [], folder: true },
   ]);
 
   return (
@@ -22,7 +18,7 @@ export default function App() {
       </div>
       <div className="flex flex-row gap-10 justify-evenly m-10">
       <FileUploader />
-      <FileStructure categories={categories} setCategories={setCategories} />
+      <FileStructure categories={categories} />
       </div>
     </div>
   );

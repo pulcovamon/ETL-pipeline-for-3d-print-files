@@ -1,18 +1,52 @@
 import { useState } from "react";
 import axios from "axios";
-import CategoryItem from "./CategoryItem";
 import { Folder } from "./types";
+import { ListOfFiles } from "./ListOfFiles";
 
 interface FileStructureProps {
   categories: Folder[];
-  setCategories: (categories: Folder[]) => void;
 }
 
 export default function FileStructure({
   categories,
-  setCategories,
 }: FileStructureProps) {
-  const [openCategories, setOpenCategories] = useState<string[]>([]);
+  const [currentPath, setCurrentPath] = useState<string[]>(["datalake"]);
+  const [currentItems, setCurrentItems] = useState<Folder[]>(categories);
+
+  async function addToPath(newItem: Folder) {
+    setCurrentPath([...currentPath, newItem.name]);
+    if (newItem.children.length > 0) {
+      setCurrentItems(newItem.children);
+    } else {
+      const children = await getCategory(newItem.name);
+      setCurrentItems(children);
+    }
+  }
+
+  function removeFromPath() {
+    if (currentPath.length > 1) {
+      setCurrentPath(currentPath.slice(0, -1));
+    }
+  }
+
+  async function setPath(item: string) {
+    const index = currentPath.indexOf(item);
+    if (index <= currentPath.length - 1) {
+      setCurrentPath(currentPath.slice(0, index + 1));
+      if (currentPath.length === 1) {
+        setCurrentItems(categories);
+      } else if (currentPath.length === 2) {
+        const children = await getCategory(item);
+        setCurrentItems(children);
+      } else {
+        const categoryItems = await getCategory(currentPath[1]);
+        const parent = categoryItems.filter((catItem) => {
+          return catItem.name === item;
+        });
+        setCurrentItems(parent[0].children);
+      }
+    }
+  }
 
   async function getCategory(category: string): Promise<Folder[]> {
     try {
@@ -24,36 +58,27 @@ export default function FileStructure({
     }
   }
 
-  async function handleCategoryClick(category: string) {
-    if (openCategories.includes(category)) {
-      setOpenCategories(
-        openCategories.filter((openCategory) => openCategory !== category)
-      );
-    } else {
-      setOpenCategories([...openCategories, category]);
-
-      const children: Folder[] = await getCategory(category);
-
-      setCategories(
-        categories.map((cat) =>
-          cat.name === category ? { ...cat, children } : cat
-        )
-      );
-    }
-  }
-
   return (
     <div className="file-structure-container p-6 bg-gray-50 rounded-lg shadow-lg dark:bg-gray-900 w-full">
-      <ul>
-        {categories.map((category) => (
-          <CategoryItem
-                key={category.name}
-                category={category}
-                openCategories={openCategories}
-                handleCategoryClick={handleCategoryClick}
-                setCategories={setCategories} categories={categories}/>
-        ))}
+      <ul className="flex flex-row">
+        {currentPath.map((item) => {
+          return (
+            <li
+              property={item}
+              onClick={() => setPath(item)}
+              className="cursor-pointer hover:underline"
+            >
+              {item}/
+            </li>
+          );
+        })}
       </ul>
+      <ListOfFiles
+        items={currentItems}
+        addToPath={addToPath}
+        parent={currentPath.length >= 3 ? currentPath[2] : null}
+        category={currentPath.length >= 2 ? currentPath[1] : null}
+      />
     </div>
   );
 }
