@@ -1,3 +1,4 @@
+import { FolderClosed } from "lucide-react";
 import FileItem from "./FileItem";
 import { Folder } from "./types";
 
@@ -21,11 +22,14 @@ export function ListOfFiles({
           if (item.folder) {
             return (
               <li
-                property={item.name}
-                className="cursor-pointer hover:underline"
+                key={item.name}
+                className="cursor-pointer hover:underline p-3 hover:text-blue-400"
                 onClick={() => addToPath(item)}
               >
-                {item.name}
+                <span className="flex flex-row gap-1">
+                  <FolderClosed size={20} />
+                  {item.name}
+                </span>
               </li>
             );
           }

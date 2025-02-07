@@ -12,7 +12,7 @@ export default function App() {
   ]);
 
   return (
-    <div className="dark:bg-gray-800 dark:text-white min-h-svh">
+    <div className="dark:bg-gray-800 dark:text-white min-h-svh text-lg">
       <div className="w-full bg-gray-100 dark:bg-gray-900 p-10 mb-10">
         <h1>ETL pipeline for 3d printing files</h1>
       </div>

@@ -52,6 +52,7 @@ export default function FileUploader() {
       alert("Failed to upload files.");
     } finally {
       setIsUploading(false);
+      setFiles([]);
     }
   };
 

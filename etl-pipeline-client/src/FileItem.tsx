@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Download, X } from "lucide-react"; // Importujeme ikonu pro download
+import { Box, Download, FileQuestion, FileText, Image, X } from "lucide-react"; // Importujeme ikonu pro download
 import STLViewer from "./StlViewer";
 import { Folder } from "./types";
 import PDFViewer from "./PdfViewer";
@@ -36,21 +36,35 @@ export default function FileItem({
     file.name.toLowerCase().endsWith(char)
   );
   const isPDF = file.name.toLocaleLowerCase().endsWith(".pdf");
+  let icon = <FileQuestion />;
+
+  if (isSTL) {
+    icon = <Box />;
+  } else if (isImage) {
+    icon = <Image />;
+  } else if (isPDF) {
+    icon = <FileText />;
+  }
 
   return (
-    <li className="text-gray-700 p-2 rounded-md flex justify-between items-center">
-      <a href={fileURL} className="text-blue-500 hover:underline">
-        {file.name}
-      </a>
-
-      {(isSTL || isImage || isPDF) && (
-        <button
+    <li className="text-gray-700 p-3 rounded-md flex justify-between items-center">
+      {isSTL || isImage || isPDF ? (
+        <span
           onClick={() => setShowViewer(true)}
-          className="text-blue-500 hover:underline cursor-pointer"
+          className="flex flex-row gap-1 text-white hover:underline cursor-pointer hover:text-blue-400"
         >
-          Preview
-        </button>
+          {icon}
+          {file.name}
+        </span>
+      ) : (
+        <span className="flex flex-row gap-1 text-white">
+          {icon}
+          {file.name}
+        </span>
       )}
+      <a href={fileURL} className="text-white hover:text-blue-400">
+        <Download />
+      </a>
 
       {showViewer && (isSTL || isImage || isPDF) && (
         <div className="fixed inset-0 bg-black-40 backdrop-blur-md flex items-center justify-center z-50">
@@ -60,7 +74,9 @@ export default function FileItem({
                 <STLViewer fileUrl={fileURL} />
               ) : isImage ? (
                 <img src={fileURL} />
-              ) : <PDFViewer fileURL={fileURL} />}
+              ) : (
+                <PDFViewer fileURL={fileURL} />
+              )}
             </div>
 
             <div className="absolute top-4 right-4 flex gap-3">
@@ -76,7 +92,7 @@ export default function FileItem({
                 onClick={() => setShowViewer(false)}
                 className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-800 transition cursor-pointer z-100"
               >
-                <X size={20}/>
+                <X size={20} />
               </button>
             </div>
           </div>
