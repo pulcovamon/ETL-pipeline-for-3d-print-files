@@ -74,6 +74,8 @@ def process_file(file_path: str):
     ext = os.path.splitext(file_path)[-1].lower()
     if ext in ['.zip', '.rar', '.7z']:
         folder_name = new_filename.split(".")[0]
+        if db.find_file(folder_name):
+            raise ValueError("Item with this name already exists!")
         extract_dir = os.path.join(dirname, os.path.splitext(new_filename)[0])
         os.makedirs(extract_dir, exist_ok=True)
         extract_file(file_path, extract_dir)
@@ -110,7 +112,7 @@ def process_file(file_path: str):
         category_dir = os.path.join(BASE_DIR, category)
         os.makedirs(category_dir, exist_ok=True)
         shutil.move(new_path, os.path.join(BASE_DIR, category, new_filename))
-        parent_id = db.find_file(category)["_id"]
+        parent_id = db.get_category(category)["_id"]
         db.insert_file(new_filename, category, folder=False, parent_id=parent_id)
         print(f"File {new_filename} moved to {category}")
     else:
