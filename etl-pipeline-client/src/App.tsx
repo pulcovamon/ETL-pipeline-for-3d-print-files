@@ -9,6 +9,7 @@ export default function App() {
     { name: "basing", children: [], folder: true },
     { name: "creature", children: [], folder: true },
     { name: "character", children: [], folder: true },
+    {name: "unknown", children: [], folder: true}
   ]);
 
   return (
