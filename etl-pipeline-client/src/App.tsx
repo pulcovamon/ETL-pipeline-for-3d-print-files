@@ -31,7 +31,7 @@ export default function App() {
       <div className="w-full bg-gray-100 dark:bg-gray-900 p-10 mb-10">
         <h1>ETL pipeline for 3D printing files</h1>
       </div>
-      <div className="flex flex-row gap-20 justify-evenly m-20">
+      <div className="flex flex-row gap-20 justify-evenly m-15">
         <div className="flex flex-col gap-20">
           <FileUploader categories={categories} />
           <AddCategory onCategoryAdded={getCategories} />
