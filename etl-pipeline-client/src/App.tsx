@@ -1,16 +1,28 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import FileStructure from "./FileStructure";
 import FileUploader from "./FileUploader";
 import { Folder } from "./types";
+import axios from "axios";
 
 export default function App() {
-  const [categories, setCategories] = useState<Folder[]>([
-    { name: "terrain", children: [], folder: true },
-    { name: "basing", children: [], folder: true },
-    { name: "creature", children: [], folder: true },
-    { name: "character", children: [], folder: true },
-    {name: "unknown", children: [], folder: true}
-  ]);
+  const [categories, setCategories] = useState<Folder[]>([]);
+
+  useEffect(() => {
+    async function getCategories() {
+      try {
+        const response = await axios.get("http://0.0.0.0:8080/categories");
+        const categoryItems = response.data.map((cat: string) => {
+          return { name: cat, children: [], folder: true }
+        });
+        setCategories(categoryItems);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    getCategories();
+    
+  }, []);
 
   return (
     <div className="dark:bg-gray-800 dark:text-white min-h-svh text-lg">
@@ -18,7 +30,7 @@ export default function App() {
         <h1>ETL pipeline for 3d printing files</h1>
       </div>
       <div className="flex flex-row gap-10 justify-evenly m-10">
-      <FileUploader />
+      <FileUploader categories={categories} />
       <FileStructure categories={categories} />
       </div>
     </div>

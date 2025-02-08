@@ -63,7 +63,7 @@ def classify_file(filename: str) -> str:
 def sanitize_filename(filename: str) -> str:
     return filename.replace(" ", "_")
 
-def process_file(file_path: str):
+def process_file(file_path: str, category: str = None):
     dirname, filename = os.path.split(file_path)
     new_filename = sanitize_filename(filename)
     new_path = os.path.join(dirname, new_filename)
@@ -80,7 +80,8 @@ def process_file(file_path: str):
         os.makedirs(extract_dir, exist_ok=True)
         extract_file(file_path, extract_dir)
 
-        category = classify_file(new_filename)
+        if not category:
+            category = classify_file(new_filename)
         category_dir = os.path.join(BASE_DIR, category)
         os.makedirs(category_dir, exist_ok=True)
         os.remove(file_path)
@@ -108,7 +109,8 @@ def process_file(file_path: str):
         
         print(f"{item_dir} moved do {category}")
     elif ext == ".stl":
-        category = classify_file(new_filename)
+        if not category:
+            category = classify_file(new_filename)
         category_dir = os.path.join(BASE_DIR, category)
         os.makedirs(category_dir, exist_ok=True)
         shutil.move(new_path, os.path.join(BASE_DIR, category, new_filename))
@@ -118,11 +120,11 @@ def process_file(file_path: str):
     else:
         print(f"File {new_filename} has unsupported type.")
 
-def process_unsorted_directory(base_dir: str):
+def process_unsorted_directory(base_dir: str, category: str = None):
     for root, dirs, files in os.walk(base_dir):
         for filename in files:
             file_path = os.path.join(root, filename)
             try:
-                process_file(file_path)
+                process_file(file_path, category)
             except Exception as e:
                 print(f"An exception occured during processing {file_path}: {e}")

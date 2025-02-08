@@ -1,10 +1,14 @@
 import { useState } from "react";
 import axios from "axios";
 import { X } from "lucide-react";
+import { Folder } from "./types";
 
-export default function FileUploader() {
+export default function FileUploader({ categories }: { categories: Folder[] }) {
   const [files, setFiles] = useState<File[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<undefined | string>(
+    undefined
+  );
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -33,6 +37,10 @@ export default function FileUploader() {
     }
   };
 
+  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedCategory(event.target.value);
+  };
+
   const handleFileUpload = async () => {
     if (files.length === 0) return;
 
@@ -43,16 +51,19 @@ export default function FileUploader() {
 
     setIsUploading(true);
     try {
-      await axios.post("http://0.0.0.0:8080/upload", formData, {
+      let url = "http://0.0.0.0:8080/upload";
+      if (selectedCategory) {
+        url += `?category=${selectedCategory}`;
+      }
+      await axios.post(url, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      alert("Files uploaded successfully!");
     } catch (error) {
       console.error("Error uploading files", error);
-      alert("Failed to upload files.");
     } finally {
       setIsUploading(false);
       setFiles([]);
+      setSelectedCategory(undefined);
     }
   };
 
@@ -67,19 +78,24 @@ export default function FileUploader() {
   return (
     <div className="p-6 space-y-6 flex flex-col justify-items-center">
       <div
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-          className={`border-2 border-dashed p-6 rounded-lg text-center ${isDragging ? "border-green-500" : ""}`}>
-        <p className="text-sm text-gray-700 dark:text-white">Drag & drop or click to select files (ZIP, RAR, 7Z, STL)</p>
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        className={`border-2 border-dashed p-6 rounded-lg text-center ${
+          isDragging ? "border-green-500" : ""
+        }`}
+      >
+        <p className="text-sm text-gray-700 dark:text-white">
+          Drag & drop or click to select files (ZIP, RAR, 7Z, STL)
+        </p>
         <input
           type="file"
           multiple
           accept=".zip,.rar,.7z,.stl"
           className="hidden"
           onChange={handleFileChange}
-          id="fileInput">
-          </input>
+          id="fileInput"
+        ></input>
         <button
           onClick={handleButtonClick}
           type="button"
@@ -100,13 +116,30 @@ export default function FileUploader() {
                   onClick={() => handleRemoveFile(file.name)}
                   className="ml-2 text-red-500 hover:text-red-700 cursor-pointer"
                 >
-                  <X size={20}/>
+                  <X size={20} />
                 </button>
               </li>
             ))}
           </ul>
         </div>
       )}
+
+      <div className="flex gap-2 justify-between">
+        <label htmlFor="categories">Category:</label>
+        <select
+          value={selectedCategory || ""}
+          onChange={handleChange}
+          name="categories"
+          className="border w-full rounded-md p-2 hover:bg-gray-900 cursor-pointer"
+        >
+          <option value={undefined}>auto...</option>
+          {categories
+            ? categories.map((cat: Folder) => {
+                return <option value={cat.name}>{cat.name}</option>;
+              })
+            : null}
+        </select>
+      </div>
 
       <button
         onClick={handleFileUpload}

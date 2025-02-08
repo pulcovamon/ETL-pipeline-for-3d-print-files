@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { Folder } from "./types";
 import { ListOfFiles } from "./ListOfFiles";
@@ -11,6 +11,12 @@ export default function FileStructure({ categories }: FileStructureProps) {
   const [currentPath, setCurrentPath] = useState<string[]>(["datalake"]);
   const [currentItems, setCurrentItems] = useState<Folder[]>(categories);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (categories.length > 0) {
+      setCurrentItems(categories);
+    }
+  }, [categories]);
 
   async function getCategory(category: string): Promise<Folder[]> {
     try {
