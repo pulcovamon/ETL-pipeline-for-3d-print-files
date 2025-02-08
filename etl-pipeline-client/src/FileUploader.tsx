@@ -76,7 +76,7 @@ export default function FileUploader({ categories }: { categories: Folder[] }) {
   };
 
   return (
-    <div className="p-6 space-y-6 flex flex-col justify-items-center">
+    <div className="space-y-6 flex flex-col justify-items-center">
       <div
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
