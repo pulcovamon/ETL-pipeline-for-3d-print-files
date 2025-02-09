@@ -9,35 +9,60 @@ interface FileStructureProps {
 
 export default function FileStructure({ categories }: FileStructureProps) {
   const [currentPath, setCurrentPath] = useState<string[]>(["datalake"]);
+  const [currentCategory, setCurrentCategory] = useState<Folder | null>(null);
   const [currentItems, setCurrentItems] = useState<Folder[]>(categories);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (categories.length > 0) {
       setCurrentItems(categories);
+      setCurrentPath(["datalake"]);
+      setCurrentCategory(null);
     }
   }, [categories]);
 
-  async function getCategory(category: string): Promise<Folder[]> {
+  async function getCategory(category: string): Promise<Folder | null> {
     try {
       const response = await axios.get(`http://0.0.0.0:8080/files/${category}`);
-      return response.data.children || [];
+      return response.data || null;
     } catch (error) {
       console.error(error);
-      return [];
+      return null;
     }
   }
 
+  function findFolderByPath(root: Folder, path: string[]): Folder | null {
+    let current = root;
+    for (let i = 2; i < path.length; i++) {
+      const next = current.children.find((child) => child.name === path[i]);
+      if (!next) return null;
+      current = next;
+    }
+    return current;
+  }
+
   async function addToPath(newItem: Folder) {
-    setCurrentPath((prevPath) => [...prevPath, newItem.name]);
+    const newPath = [...currentPath, newItem.name];
+    setCurrentPath(newPath);
     setCurrentItems([]);
     setLoading(true);
 
-    if (newItem.children.length > 0) {
-      setCurrentItems(newItem.children);
+    if (!currentCategory || currentCategory.name !== newItem.category) {
+      const categoryData = await getCategory(newItem.category);
+      if (!categoryData) {
+        setLoading(false);
+        return;
+      }
+      setCurrentCategory(categoryData);
+      if (newItem.name === newItem.category) {
+        setCurrentItems(categoryData.children);
+      } else {
+        const targetFolder = findFolderByPath(categoryData, newPath);
+        setCurrentItems(targetFolder ? targetFolder.children : []);
+      }
     } else {
-      const children = await getCategory(newItem.name);
-      setCurrentItems(children);
+      const targetFolder = findFolderByPath(currentCategory, newPath);
+      setCurrentItems(targetFolder ? targetFolder.children : []);
     }
 
     setLoading(false);
@@ -47,19 +72,19 @@ export default function FileStructure({ categories }: FileStructureProps) {
     const index = currentPath.indexOf(item);
     if (index === -1) return;
 
-    setCurrentPath((prevPath) => prevPath.slice(0, index + 1));
+    const newPath = currentPath.slice(0, index + 1);
+    setCurrentPath(newPath);
     setCurrentItems([]);
     setLoading(true);
 
-    let newItems: Folder[] = [];
-
     if (index === 0) {
-      newItems = categories;
-    } else {
-      newItems = await getCategory(item);
+      setCurrentItems(categories);
+      setCurrentCategory(null);
+    } else if (currentCategory) {
+      const targetFolder = findFolderByPath(currentCategory, newPath);
+      setCurrentItems(targetFolder ? targetFolder.children : []);
     }
 
-    setCurrentItems(newItems);
     setLoading(false);
   }
 
@@ -81,7 +106,7 @@ export default function FileStructure({ categories }: FileStructureProps) {
         <p>Loading...</p>
       ) : (
         <ListOfFiles
-          items={[...new Set(currentItems)]}
+          items={currentItems}
           addToPath={addToPath}
           parent={currentPath.length >= 3 ? currentPath[2] : null}
           category={currentPath.length >= 2 ? currentPath[1] : null}

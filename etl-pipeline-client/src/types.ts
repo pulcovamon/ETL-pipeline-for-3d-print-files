@@ -1,6 +1,8 @@
 export interface Folder {
     name: string;
     children: Folder[];
-    folder: boolean
+    folder: boolean,
+    path: string[];
+    category: string;
   }
   

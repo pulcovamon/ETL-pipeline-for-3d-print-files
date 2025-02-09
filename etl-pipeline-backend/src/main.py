@@ -37,7 +37,7 @@ class NewCategory(BaseModel):
 
 @app.post("/upload")
 async def upload_files(
-    background_tasks: BackgroundTasks, files: List[UploadFile] = File(...), category: str = None
+    background_tasks: BackgroundTasks, files: List[UploadFile] = File(...), category: str = None, flatten: bool = True
 ):
     saved_files = []
     for upload in files:
@@ -51,7 +51,7 @@ async def upload_files(
             content = await upload.read()
             f.write(content)
         saved_files.append(upload.filename)
-    background_tasks.add_task(process_unsorted_directory, UNSORTED_DIR, category)
+    background_tasks.add_task(process_unsorted_directory, UNSORTED_DIR, category, flatten)
     return {"status": "Files uploaded", "files": saved_files}
 
 

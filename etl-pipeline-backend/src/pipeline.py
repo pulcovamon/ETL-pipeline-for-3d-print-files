@@ -23,7 +23,6 @@ UNSORTED_DIR = os.path.join(BASE_DIR, "unsorted")
 CATEGORIES = list(config["categories"].keys())
 CATEGORIES.append("unknown")
 
-
 os.makedirs(UNSORTED_DIR, exist_ok=True)
 for cat in CATEGORIES:
     os.makedirs(os.path.join(BASE_DIR, cat), exist_ok=True)
@@ -32,17 +31,43 @@ for cat in CATEGORIES:
 # ETL Functions         #
 #########################
 
-def extract_file(file_path: str, dest_dir: str):
-    if file_path.endswith('.zip'):
-        with zipfile.ZipFile(file_path, 'r') as zip_ref:
-            zip_ref.extractall(dest_dir)
-    elif file_path.endswith('.rar'):
-        Archive(file_path).extractall(dest_dir)
-    elif file_path.endswith('.7z'):
-        with py7zr.SevenZipFile(file_path, mode='r') as z:
-            z.extractall(path=dest_dir)
+def extract_file(file_path: str, dest_dir: str, flatten: bool = False):
+    def extract_archive(archive_path: str, extract_dir: str):
+        """Extrahuje archiv, pokud je podporovaný (zip, rar, 7z)"""
+        if archive_path.endswith('.zip'):
+            with zipfile.ZipFile(archive_path, 'r') as zip_ref:
+                zip_ref.extractall(extract_dir)
+        elif archive_path.endswith('.rar'):
+            Archive(archive_path).extractall(extract_dir)
+        elif archive_path.endswith('.7z'):
+            with py7zr.SevenZipFile(archive_path, mode='r') as z:
+                z.extractall(path=extract_dir)
+        else:
+            print(f"File {archive_path} cannot be extracted.")
+            return False
+        return True
+
+    def recursively_extract(archive_path: str, extract_dir: str):
+        if not extract_archive(archive_path, extract_dir):
+            return
+        for root, dirs, files in os.walk(extract_dir):
+            for file in files:
+                file_path = os.path.join(root, file)
+                if file.endswith(('.zip', '.rar', '.7z')):
+                    recursively_extract(file_path, os.path.join(root, 'extracted'))
+
+    extract_temp_dir = os.path.join(dest_dir, "temp_extracted")
+    os.makedirs(extract_temp_dir, exist_ok=True)
+
+    recursively_extract(file_path, extract_temp_dir)
+
+    if flatten:
+        for root, _, files in os.walk(extract_temp_dir):
+            for file in files:
+                shutil.move(os.path.join(root, file), os.path.join(dest_dir, file))
+        shutil.rmtree(extract_temp_dir)
     else:
-        print(f"File {file_path} cannot be extracted.")
+        shutil.move(extract_temp_dir, dest_dir)
 
 def classify_file(filename: str) -> str:
     filename = filename.split(".")[0].lower()
@@ -63,7 +88,31 @@ def classify_file(filename: str) -> str:
 def sanitize_filename(filename: str) -> str:
     return filename.replace(" ", "_")
 
-def process_file(file_path: str, category: str = None):
+def build_tree(root):
+    tree = {
+        "name": os.path.basename(root),
+        "folder": True,
+        "path": root.split(os.sep),
+        "children": []
+    }
+    try:
+        for entry in os.scandir(root):
+            if entry.is_dir():
+                tree["children"].append(build_tree(entry.path))
+            elif os.path.splitext(entry)[-1].lower() in [".stl", ".png", ".jpg", ".jpeg", ".pdf", ".lys", ".blend", ".obj"]:
+                    tree["children"].append({
+                        "name": entry.name,
+                        "folder": False,
+                        "path": entry.path.split(os.sep)
+                    })
+    except PermissionError:
+        pass  
+    return tree
+
+def build_directory_structure(root_path):
+    return build_tree(root_path)
+
+def process_file(file_path: str, category: str = None, flatten: bool = False):
     dirname, filename = os.path.split(file_path)
     new_filename = sanitize_filename(filename)
     new_path = os.path.join(dirname, new_filename)
@@ -76,38 +125,25 @@ def process_file(file_path: str, category: str = None):
         folder_name = new_filename.split(".")[0]
         if db.find_file(folder_name):
             raise ValueError("Item with this name already exists!")
-        extract_dir = os.path.join(dirname, os.path.splitext(new_filename)[0])
+        extract_dir = os.path.join(dirname, folder_name)
         os.makedirs(extract_dir, exist_ok=True)
-        extract_file(file_path, extract_dir)
+        extract_file(file_path, extract_dir, flatten)
 
         if not category:
             category = classify_file(new_filename)
         category_dir = os.path.join(BASE_DIR, category)
         os.makedirs(category_dir, exist_ok=True)
         os.remove(file_path)
-        
+
         parent = db.get_category(category)
         parent_id = parent["_id"]
-        item_dir = extract_dir.split("/")[-1]
-        children = []
-        for root, dirs, files in os.walk(extract_dir):
-            for f in files:
-                src = os.path.join(root, f)
-                if f.split(".")[1] not in ["png", "jpg", "jpeg", "stl", "lys", "pdf", "blend"]:
-                    os.remove(src)
-                    continue
-                dst = os.path.join(category_dir, item_dir, f)
-                os.makedirs(os.path.dirname(dst), exist_ok=True)
-                shutil.move(src, dst)
-                children.append({
-                    "name": f,
-                    "category": category,
-                    "folder": False,
-                })
-        db.insert_file(folder_name, category, parent_id=parent_id, children=children)
+
+        directory_structure = build_tree(extract_dir)
+
+        db.insert_file(folder_name, category, parent_id=parent_id, children=directory_structure["children"])
         shutil.rmtree(extract_dir)
-        
-        print(f"{item_dir} moved do {category}")
+
+        print(f"{folder_name} moved to {category}")
     elif ext == ".stl":
         if not category:
             category = classify_file(new_filename)
@@ -120,11 +156,11 @@ def process_file(file_path: str, category: str = None):
     else:
         print(f"File {new_filename} has unsupported type.")
 
-def process_unsorted_directory(base_dir: str, category: str = None):
+def process_unsorted_directory(base_dir: str, category: str = None, flatten: bool = False):
     for root, dirs, files in os.walk(base_dir):
         for filename in files:
             file_path = os.path.join(root, filename)
             try:
-                process_file(file_path, category)
+                process_file(file_path, category, flatten)
             except Exception as e:
-                print(f"An exception occured during processing {file_path}: {e}")
+                print(f"An exception occurred during processing {file_path}: {e}")

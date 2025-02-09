@@ -23,7 +23,8 @@ if (!db.config.findOne({ type: "settings" })) {
             "basing": "Small decorative elements attached to miniatures' bases: loose objects like scattered weapons, coins, skulls, tiny plants, rocks, and small animals (rats, birds, rabbits) and pets.",
             "creature": "Fantasy and sci-fi monsters: beasts, undead, dragons, demons, insects, mutants, giant animals.",
             "character": "Playable characters and NPCs: humans, elves, dwarves, warriors, wizards, knights, adventurers."
-        }
+        },
+        rules: []
     });
 } else {
     print("Configuration already exists.");
@@ -40,9 +41,9 @@ if (!db.files.findOne({ name: "root_folder" })) {
         "unknown"
     ]
     const data = categories.map((category) => {
-        return { name: category, category: "", folder: true, children: [] }
+        return { name: category, category: category, folder: true, children: [], path: ["datalake"] }
     })
-    data.push({ name: "datalake", category: "", folder: true, children: categories})
+    data.push({ name: "datalake", category: "", folder: true, children: categories, path: []})
     db.files.insertMany(data);
 } else {
     print("Database already exists.");

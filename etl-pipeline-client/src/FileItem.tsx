@@ -47,7 +47,9 @@ export default function FileItem({
   }
 
   return (
-    <li className="text-gray-700 p-4 pr-15 pl-10 rounded-md flex justify-between items-center">
+    <div
+      className="text-gray-700 p-4 pr-15 pl-10 rounded-md flex justify-between items-center"
+    >
       {isSTL || isImage || isPDF ? (
         <span
           onClick={() => setShowViewer(true)}
@@ -98,6 +100,6 @@ export default function FileItem({
           </div>
         </div>
       )}
-    </li>
+    </div>
   );
 }

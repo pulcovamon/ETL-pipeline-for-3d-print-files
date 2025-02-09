@@ -3,12 +3,46 @@ import axios from "axios";
 import { X } from "lucide-react";
 import { Folder } from "./types";
 
+// Typy pro FancyCheckbox
+type FancyCheckboxProps = {
+  isChecked: boolean;
+  onChange: () => void;
+};
+
+const FancyCheckbox: React.FC<FancyCheckboxProps> = ({ isChecked, onChange }) => {
+  return (
+    <label className="flex items-center space-x-3 cursor-pointer">
+      <span className="relative inline-block">
+        <input
+          type="checkbox"
+          checked={isChecked}
+          onChange={onChange}
+          className="absolute opacity-0 w-0 h-0"
+        />
+        <span
+          className={`block w-10 h-6 rounded-full border-2 
+            ${isChecked ? 'bg-blue-600 border-blue-600' : 'bg-white border-gray-400'} 
+            transition-all duration-300 ease-in-out`}
+        >
+          <span
+            className={`absolute top-1 left-1 block w-4 h-4 rounded-full 
+              ${isChecked ? 'bg-white transform translate-x-4' : 'bg-gray-300'}
+              transition-all duration-300 ease-in-out`}
+          ></span>
+        </span>
+      </span>
+      <span className="text-white font-medium">Flatten directories</span>
+    </label>
+  );
+};
+
 export default function FileUploader({ categories }: { categories: Folder[] }) {
   const [files, setFiles] = useState<File[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<undefined | string>(
     undefined
   );
+  const [flattenDirectories, setFlattenDirectories] = useState<boolean>(false);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -52,8 +86,16 @@ export default function FileUploader({ categories }: { categories: Folder[] }) {
     setIsUploading(true);
     try {
       let url = "http://0.0.0.0:8080/upload";
+      const params: string[] = [];
+
       if (selectedCategory) {
-        url += `?category=${selectedCategory}`;
+        params.push(`category=${selectedCategory}`);
+      }
+      if (flattenDirectories) {
+        params.push(`flatten=true`);
+      }
+      if (params.length > 0) {
+        url += `?${params.join("&")}`;
       }
       await axios.post(url, formData, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -64,6 +106,7 @@ export default function FileUploader({ categories }: { categories: Folder[] }) {
       setIsUploading(false);
       setFiles([]);
       setSelectedCategory(undefined);
+      setFlattenDirectories(false);
     }
   };
 
@@ -132,13 +175,26 @@ export default function FileUploader({ categories }: { categories: Folder[] }) {
           name="categories"
           className="border w-full rounded-md p-2 hover:bg-gray-900 cursor-pointer"
         >
-          <option value={undefined}>auto...</option>
+          <option key="auto" value={undefined}>
+            auto...
+          </option>
           {categories
             ? categories.map((cat: Folder) => {
-                return <option value={cat.name}>{cat.name}</option>;
+                return (
+                  <option key={cat.name} value={cat.name}>
+                    {cat.name}
+                  </option>
+                );
               })
             : null}
         </select>
+      </div>
+
+      <div className="flex gap-2 justify-between">
+        <FancyCheckbox
+          isChecked={flattenDirectories}
+          onChange={() => setFlattenDirectories(!flattenDirectories)}
+        />
       </div>
 
       <button

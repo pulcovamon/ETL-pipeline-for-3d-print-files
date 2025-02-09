@@ -34,11 +34,13 @@ export function ListOfFiles({
             );
           }
           return (
+            <li key={item.name}>
             <FileItem
               file={item}
               parent={parent}
               category={category as string}
             />
+            </li>
           );
         })}
       </ul>

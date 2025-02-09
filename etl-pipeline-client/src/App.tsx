@@ -15,6 +15,8 @@ export default function App() {
         name: cat,
         children: [],
         folder: true,
+        path: ["datalake"],
+        category: cat,
       }));
       setCategories(categoryItems);
     } catch (error) {
@@ -27,8 +29,8 @@ export default function App() {
   }, []);
 
   return (
-    <div className="dark:bg-gray-800 dark:text-white min-h-svh text-lg">
-      <div className="w-full bg-gray-100 dark:bg-gray-900 p-10 mb-10">
+    <div className="dark:bg-gray-800 dark:text-white min-h-svh text-lg font-mono">
+      <div className="w-full bg-gray-100 dark:bg-gray-900 p-5 mb-10">
         <h1>ETL pipeline for 3D printing files</h1>
       </div>
       <div className="flex flex-row gap-20 justify-evenly m-15">
