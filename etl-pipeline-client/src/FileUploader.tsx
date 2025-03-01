@@ -128,7 +128,7 @@ export default function FileUploader({ categories }: { categories: Folder[] }) {
           isDragging ? "border-green-500" : ""
         }`}
       >
-        <p className="text-sm text-gray-700 dark:text-white">
+        <p className="text-sm text-white">
           Drag & drop or click to select files (ZIP, RAR, 7Z, STL)
         </p>
         <input

@@ -70,7 +70,7 @@ export default function FileItem({
 
       {showViewer && (isSTL || isImage || isPDF) && (
         <div className="fixed inset-0 bg-black-40 backdrop-blur-md flex items-center justify-center z-50">
-          <div className="bg-white bg-opacity-95 rounded-lg shadow-lg p-5 relative flex flex-col items-center dark:bg-gray-900 max-h-screen max-w-screen">
+          <div className="bg-opacity-95 rounded-lg shadow-lg p-5 relative flex flex-col items-center bg-gray-900 max-h-screen max-w-screen">
             <div className="flex flex-row justify-between gap-5 w-full items-center pb-5">
               <h4 className="text-white">{file.name}</h4>
               <div className="flex gap-3">
@@ -91,7 +91,7 @@ export default function FileItem({
             </div>
             </div>
           <div className="bg-linear-to-r from-red-600 to-yellow-600 p-1 rounded-lg">
-            <div className="bg-white flex items-center justify-center border-none rounded-lg overflow-hidden dark:bg-gray-900">
+            <div className="flex items-center justify-center border-none rounded-lg overflow-hidden bg-gray-900">
               {isSTL ? (
                 <STLViewer fileUrl={fileURL} />
               ) : isImage ? (

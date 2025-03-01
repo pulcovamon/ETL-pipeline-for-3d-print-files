@@ -89,7 +89,7 @@ export default function FileStructure({ categories }: FileStructureProps) {
   }
 
   return (
-    <div className="file-structure-container p-6 bg-gray-50 rounded-lg shadow-lg dark:bg-gray-900 w-full border border-white">
+    <div className="file-structure-container p-6 rounded-lg shadow-lg bg-gray-900 w-full border border-white">
       <div className="flex flex-row items-center justify-between">
       <ul className="flex flex-row">
         {currentPath.map((item) => (

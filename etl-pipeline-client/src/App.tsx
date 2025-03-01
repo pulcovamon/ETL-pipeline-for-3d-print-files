@@ -29,8 +29,8 @@ export default function App() {
   }, []);
 
   return (
-    <div className="dark:bg-gray-800 dark:text-white min-h-svh text-lg font-mono bg-[url(/star.svg)] bg-repeat">
-      <div className="w-full bg-gray-100 dark:bg-gray-900 p-4 flex flex-row gap-5 items-center">
+    <div className="bg-gray-800 text-white min-h-svh text-lg font-mono bg-[url(/star.svg)] bg-repeat">
+      <div className="w-full bg-gray-900 p-4 flex flex-row gap-5 items-center">
         <img src="/logo.svg" width={50}></img>
         <h1>ETL Pipeline and Storage for 3d Printing Files</h1>
       </div>
