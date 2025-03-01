@@ -23,7 +23,7 @@ export function ListOfFiles({
             return (
               <li
                 key={item.name}
-                className="cursor-pointer hover:underline p-4 pr-15 pl-10 hover:text-blue-400"
+                className="cursor-pointer hover:underline p-4 pr-15 pl-10 hover:text-orange-500 justify-items-start w-fit"
                 onClick={() => addToPath(item)}
               >
                 <span className="flex flex-row gap-1">

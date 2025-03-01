@@ -16,7 +16,7 @@ export default function AddCategory({ onCategoryAdded }: { onCategoryAdded: () =
         setError(null);
 
         try {
-            await axios.post("http://0.0.0.0:8080/categories", { name: categoryName });
+            await axios.post("http://0.0.0.0:8000/categories", { name: categoryName });
             setCategoryName("");
             onCategoryAdded();
         } catch (error: any) {
@@ -31,7 +31,7 @@ export default function AddCategory({ onCategoryAdded }: { onCategoryAdded: () =
     };
 
     return (
-        <div className="space-y-4 p-5 border rounded-lg">
+        <div className="space-y-4 p-5 border rounded-lg bg-gray-900">
             <h3 className="font-semibold">Add New Category</h3>
             <input
                 type="text"
@@ -43,7 +43,7 @@ export default function AddCategory({ onCategoryAdded }: { onCategoryAdded: () =
             {error && <p className="text-red-500">{error}</p>}
             <button
                 onClick={handleAddCategory}
-                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 disabled:bg-gray-500 cursor-pointer"
+                className="bg-linear-to-r from-yellow-600 to-red-600 text-white px-4 py-2 rounded-md hover:from-yellow-700 hover:to-red-800 disabled:from-gray-500 disabled:to-gray-500 cursor-pointer disabled:cursor-not-allowed"
                 disabled={isLoading || categoryName === ""}
             >
                 {isLoading ? "Adding..." : "Add Category"}

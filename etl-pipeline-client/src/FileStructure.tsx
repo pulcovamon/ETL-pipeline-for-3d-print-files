@@ -23,7 +23,7 @@ export default function FileStructure({ categories }: FileStructureProps) {
 
   async function getCategory(category: string): Promise<Folder | null> {
     try {
-      const response = await axios.get(`http://0.0.0.0:8080/files/${category}`);
+      const response = await axios.get(`http://0.0.0.0:8000/files/${category}`);
       return response.data || null;
     } catch (error) {
       console.error(error);
@@ -89,18 +89,21 @@ export default function FileStructure({ categories }: FileStructureProps) {
   }
 
   return (
-    <div className="file-structure-container p-6 bg-gray-50 rounded-lg shadow-lg dark:bg-gray-900 w-full">
+    <div className="file-structure-container p-6 bg-gray-50 rounded-lg shadow-lg dark:bg-gray-900 w-full border border-white">
+      <div className="flex flex-row items-center justify-between">
       <ul className="flex flex-row">
         {currentPath.map((item) => (
           <li
             key={item}
             onClick={() => setPath(item)}
-            className="cursor-pointer hover:underline hover:text-blue-400"
+            className="cursor-pointer hover:underline hover:text-orange-500"
           >
             {item}/
           </li>
         ))}
       </ul>
+      <img src="/files.svg"></img>
+      </div>
       <hr />
       {loading ? (
         <p>Loading...</p>

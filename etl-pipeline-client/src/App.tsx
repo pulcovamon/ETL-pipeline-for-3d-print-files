@@ -10,7 +10,7 @@ export default function App() {
 
   const getCategories = async () => {
     try {
-      const response = await axios.get("http://0.0.0.0:8080/categories");
+      const response = await axios.get("http://0.0.0.0:8000/categories");
       const categoryItems = response.data.map((cat: string) => ({
         name: cat,
         children: [],
@@ -29,12 +29,13 @@ export default function App() {
   }, []);
 
   return (
-    <div className="dark:bg-gray-800 dark:text-white min-h-svh text-lg font-mono">
-      <div className="w-full bg-gray-100 dark:bg-gray-900 p-5 mb-10">
-        <h1>ETL pipeline for 3D printing files</h1>
+    <div className="dark:bg-gray-800 dark:text-white min-h-svh text-lg font-mono bg-[url(/star.svg)] bg-repeat">
+      <div className="w-full bg-gray-100 dark:bg-gray-900 p-4 flex flex-row gap-5 items-center">
+        <img src="/logo.svg" width={50}></img>
+        <h1>ETL Pipeline and Storage for 3d Printing Files</h1>
       </div>
-      <div className="flex flex-row gap-20 justify-evenly m-15">
-        <div className="flex flex-col gap-20">
+      <div className="flex flex-row gap-10 justify-evenly m-20 mt-15">
+        <div className="flex flex-col gap-10">
           <FileUploader categories={categories} />
           <AddCategory onCategoryAdded={getCategories} />
         </div>

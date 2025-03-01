@@ -21,13 +21,13 @@ const FancyCheckbox: React.FC<FancyCheckboxProps> = ({ isChecked, onChange }) =>
         />
         <span
           className={`block w-10 h-6 rounded-full border-2 
-            ${isChecked ? 'bg-blue-600 border-blue-600' : 'bg-white border-gray-400'} 
+            ${isChecked ? 'border-none bg-linear-to-r from-yellow-600 to-red-600' : 'bg-white border-gray-400'} 
             transition-all duration-300 ease-in-out`}
         >
           <span
             className={`absolute top-1 left-1 block w-4 h-4 rounded-full 
               ${isChecked ? 'bg-white transform translate-x-4' : 'bg-gray-300'}
-              transition-all duration-300 ease-in-out`}
+              transition duration-300 ease-in-out`}
           ></span>
         </span>
       </span>
@@ -85,7 +85,7 @@ export default function FileUploader({ categories }: { categories: Folder[] }) {
 
     setIsUploading(true);
     try {
-      let url = "http://0.0.0.0:8080/upload";
+      let url = "http://0.0.0.0:8000/upload";
       const params: string[] = [];
 
       if (selectedCategory) {
@@ -119,7 +119,7 @@ export default function FileUploader({ categories }: { categories: Folder[] }) {
   };
 
   return (
-    <div className="space-y-6 flex flex-col justify-items-center">
+    <div className="space-y-6 flex flex-col justify-items-center bg-gray-900 p-5 rounded-lg border border-white">
       <div
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
@@ -142,7 +142,7 @@ export default function FileUploader({ categories }: { categories: Folder[] }) {
         <button
           onClick={handleButtonClick}
           type="button"
-          className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 cursor-pointer"
+          className="mt-4 bg-linear-to-r from-yellow-600 to-red-600 text-white px-4 py-2 rounded-md hover:from-yellow-700 hover:to-red-800 cursor-pointer transition duration-300 ease-in-out"
         >
           Select File
         </button>
@@ -199,7 +199,7 @@ export default function FileUploader({ categories }: { categories: Folder[] }) {
 
       <button
         onClick={handleFileUpload}
-        className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 cursor-pointer disabled:bg-gray-500 disabled:hover:bg-gray-500 disabled:cursor-not-allowed"
+        className="mt-4 bg-linear-to-r from-yellow-600 to-red-600 text-white px-4 py-2 rounded-md hover:from-yellow-700 hover:from-red-800 transition duration-300 ease-in-out cursor-pointer disabled:from-gray-500 disabled:to-gray-500 disabled:cursor-not-allowed"
         disabled={isUploading || files.length === 0}
       >
         {isUploading ? "Uploading..." : "Send"}

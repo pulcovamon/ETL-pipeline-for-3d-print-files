@@ -23,7 +23,7 @@ export default function FileItem({
     parent?: string | null
   ) => {
     const encodedFileName = encodeURIComponent(fileName);
-    let url = `http://localhost:8080/files/${category}/${encodedFileName}`;
+    let url = `http://localhost:8000/files/${category}/${encodedFileName}`;
     if (parent) {
       url += `?parent=${encodeURIComponent(parent)}`;
     }
@@ -53,7 +53,7 @@ export default function FileItem({
       {isSTL || isImage || isPDF ? (
         <span
           onClick={() => setShowViewer(true)}
-          className="flex flex-row gap-1 text-white hover:underline cursor-pointer hover:text-blue-400"
+          className="flex flex-row gap-1 text-white hover:underline cursor-pointer hover:text-orange-500"
         >
           {icon}
           {file.name}
@@ -64,14 +64,34 @@ export default function FileItem({
           {file.name}
         </span>
       )}
-      <a href={fileURL} className="text-white hover:text-blue-400">
+      <a href={fileURL} className="text-white hover:text-orange-500">
         <Download />
       </a>
 
       {showViewer && (isSTL || isImage || isPDF) && (
         <div className="fixed inset-0 bg-black-40 backdrop-blur-md flex items-center justify-center z-50">
-          <div className="bg-white bg-opacity-95 rounded-lg shadow-lg p-6 relative flex flex-col items-center dark:bg-gray-900 max-h-screen max-w-screen">
-            <div className="flex items-center justify-center border border-gray-400 rounded-lg overflow-hidden">
+          <div className="bg-white bg-opacity-95 rounded-lg shadow-lg p-5 relative flex flex-col items-center dark:bg-gray-900 max-h-screen max-w-screen">
+            <div className="flex flex-row justify-between gap-5 w-full items-center pb-5">
+              <h4 className="text-white">{file.name}</h4>
+              <div className="flex gap-3">
+              <a
+                href={fileURL}
+                download
+                className="flex items-center gap-2 px-4 py-2 bg-linear-to-t from-yellow-600 to-red-600 text-white rounded-md hover:from-yellow-700 hover:to-red-800 transition duration-300 ease-in-out z-100"
+              >
+                <Download size={20} />
+              </a>
+
+              <button
+                onClick={() => setShowViewer(false)}
+                className="px-4 py-2 bg-linear-to-t from-yellow-600 to-red-600 text-white rounded-md hover:from-yellow-700 hover:to-red-800 transition duration-300 ease-in-out cursor-pointer z-100"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            </div>
+          <div className="bg-linear-to-r from-red-600 to-yellow-600 p-1 rounded-lg">
+            <div className="bg-white flex items-center justify-center border-none rounded-lg overflow-hidden dark:bg-gray-900">
               {isSTL ? (
                 <STLViewer fileUrl={fileURL} />
               ) : isImage ? (
@@ -80,23 +100,7 @@ export default function FileItem({
                 <PDFViewer fileURL={fileURL} />
               )}
             </div>
-
-            <div className="absolute top-4 right-4 flex gap-3">
-              <a
-                href={fileURL}
-                download
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-800 transition z-100"
-              >
-                <Download size={20} />
-              </a>
-
-              <button
-                onClick={() => setShowViewer(false)}
-                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-800 transition cursor-pointer z-100"
-              >
-                <X size={20} />
-              </button>
-            </div>
+          </div>
           </div>
         </div>
       )}
