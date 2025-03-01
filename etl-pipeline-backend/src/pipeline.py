@@ -141,7 +141,8 @@ def process_file(file_path: str, category: str = None, flatten: bool = False):
         directory_structure = build_tree(extract_dir)
 
         db.insert_file(folder_name, category, parent_id=parent_id, children=directory_structure["children"])
-        shutil.rmtree(extract_dir)
+        target_path = os.path.join(category_dir, folder_name)
+        shutil.move(extract_dir, target_path)
 
         print(f"{folder_name} moved to {category}")
     elif ext == ".stl":
