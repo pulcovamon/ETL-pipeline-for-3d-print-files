@@ -92,7 +92,9 @@ export default function FileUploader({ categories }: { categories: Folder[] }) {
         params.push(`category=${selectedCategory}`);
       }
       if (flattenDirectories) {
-        params.push(`flatten=true`);
+        params.push("flatten=true");
+      } else {
+        params.push("flatten=false");
       }
       if (params.length > 0) {
         url += `?${params.join("&")}`;

@@ -46,8 +46,10 @@ export default function FileStructure({ categories }: FileStructureProps) {
     setCurrentPath(newPath);
     setCurrentItems([]);
     setLoading(true);
+    console.log(currentCategory);
 
     if (!currentCategory || currentCategory.name !== newItem.category) {
+      console.log(newItem.category);
       const categoryData = await getCategory(newItem.category);
       if (!categoryData) {
         setLoading(false);

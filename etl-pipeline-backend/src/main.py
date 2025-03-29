@@ -30,6 +30,9 @@ app.add_middleware(
 
 class NewCategory(BaseModel):
     name: str
+    
+class FileInfo(BaseModel):
+    name: str
 
 #########################
 # API Endpoints         #
@@ -90,12 +93,33 @@ def download_file(category: str, filename: str, parent: str=None):
             filename = os.path.join(parent, filename)
         file_path = os.path.join(BASE_DIR, category, filename)
 
-        print(file_path)
         if not os.path.isfile(file_path):
             raise HTTPException(status_code=404, detail="File not found on disk")
 
         return FileResponse(file_path, filename=filename)
 
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+
+@app.put("files/{category}/{filename}")
+def rename_file(category: str, filename: str, file: FileInfo, parent: str=None):
+    try:
+        if parent:
+            filename = os.path.join(parent, filename)
+        directory = os.path.join(BASE_DIR, category)
+        old_file_path = os.path.join(directory, filename)
+
+        if not os.path.isfile(old_file_path):
+            raise HTTPException(status_code=404, detail="File not found on disk")
+
+        file.name = sanitize_filename(file.name)
+        new_file_path = os.path.join(directory, file.name)
+        shutil.move(old_file_path, new_file_path)
+        
+        file_id = db.find_file(filename)["_id"]
+        db.update_file(file_id, {"name": file.name})
+        
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     

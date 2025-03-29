@@ -51,10 +51,18 @@ def extract_file(file_path: str, dest_dir: str, flatten: bool = False):
         if not extract_archive(archive_path, extract_dir):
             return
         for root, dirs, files in os.walk(extract_dir):
+            for directory in dirs:
+                path = os.path.join(root, directory)
+                new_path = os.path.join(root, sanitize_filename(directory))
+                shutil.move(path, new_path)
             for file in files:
                 file_path = os.path.join(root, file)
                 if file.endswith(('.zip', '.rar', '.7z')):
-                    recursively_extract(file_path, os.path.join(root, 'extracted'))
+                    new_file_path = os.path.join(root,sanitize_filename(file.split(".")[0]))
+                    recursively_extract(file_path, new_file_path)
+                else:
+                    new_file_path = os.path.join(root, sanitize_filename(file))
+                    shutil.move(file_path, new_file_path)
 
     extract_temp_dir = os.path.join(dest_dir, "temp_extracted")
     os.makedirs(extract_temp_dir, exist_ok=True)

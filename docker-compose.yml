@@ -33,6 +33,14 @@ services:
     networks:
       - etl-pipeline
 
+  frontend:
+    build:
+      context: ./etl-pipeline-client
+    ports:
+      - "80:80"
+    networks:
+      - etl-pipeline
+
 volumes:
   datalake_volume:
   mongo_data:

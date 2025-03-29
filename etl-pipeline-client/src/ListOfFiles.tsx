@@ -20,6 +20,8 @@ export function ListOfFiles({
       <ul>
         {items.map((item) => {
           if (item.folder) {
+            console.log("Folder")
+            console.log(item);
             return (
               <li
                 key={item.name}
@@ -33,6 +35,8 @@ export function ListOfFiles({
               </li>
             );
           }
+          console.log("File");
+          console.log(item);
           return (
             <li key={item.name}>
             <FileItem
